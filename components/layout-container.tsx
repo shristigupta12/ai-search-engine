@@ -4,10 +4,15 @@ import { Sidebar } from "@/modules/sidebar/components/sidebar"
 import { IconLayoutSidebarLeftExpand } from "@tabler/icons-react"
 import { useSidebar } from "@/modules/sidebar/context/sidebar-context";
 import { Button } from "./ui/button";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 export const LayoutContainer = ({children}: {children: React.ReactNode}) => {
     const {toggleOpen} = useSidebar();
+    const [queryClient] = useState(() => new QueryClient());
     return(
+      <QueryClientProvider client={queryClient}>
         <div className="flex">
             <Sidebar />
             {/* <Button variant="ghost" size="icon" onClick={() => toggleOpen()} className="hover:cursor-pointer  hover:bg-white"> */}
@@ -17,5 +22,6 @@ export const LayoutContainer = ({children}: {children: React.ReactNode}) => {
               {children}
             </div>
         </div>
+        </QueryClientProvider>
     )
 }

@@ -25,14 +25,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SidebarProvider>
-          <LayoutContainer children={children} />
-        </SidebarProvider>
+          <SidebarProvider>
+            <LayoutContainer children={children} />
+          </SidebarProvider>
       </body>
     </html>
   );
