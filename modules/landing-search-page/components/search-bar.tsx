@@ -10,7 +10,8 @@ import { ChatPage } from "./chat-page";
 
 export default function SearchBar() {
 
-    const [query, setQuery] = useState('');
+    const [query, setQuery] = useState<string>('');
+    const [inputValue, setInputValue] = useState<string>('');
 
     const {data: suggestions = [], isLoading} = useQuery({
         queryKey: ['autocomplete', query],
@@ -26,7 +27,7 @@ export default function SearchBar() {
     return(
         <div className="flex flex-col gap-3">
             <div className="relative flex ">
-                <Input className="w-[50vw] pr-18" onChange={e=> setQuery(e.target.value)} placeholder="What is the weather today?" />
+                <Input className="w-[50vw] pr-18" onChange={e=> {setQuery(e.target.value); setInputValue(e.target.value)}} placeholder="What is the weather today?" value={inputValue} />
                 <Button variant={"ghost"} size={"icon"} className="absolute right-12 top-1/2 -translate-y-1/2 text-neutral-500 cursor-pointer h-7">
                     <IconLinkPlus size={20} />
                 </Button>
@@ -34,7 +35,7 @@ export default function SearchBar() {
                     <IconArrowRight size={20} />
                 </Button>
             </div>
-            {isLoading ? <div>Loading...</div> : suggestions.length > 0 ? <ChatPage suggestions={suggestions} /> : <div>No suggestions found</div>}
+            {isLoading ? <div>Loading...</div> : suggestions.length > 0 ? <ChatPage suggestions={suggestions} setQuery={setInputValue}/> : <div></div>}
         </div>
     )
 }

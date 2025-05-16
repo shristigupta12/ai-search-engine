@@ -1,8 +1,11 @@
-export const ChatPage = ({suggestions}: {suggestions: any}) => {
+import { SetStateAction } from "react"
+import { Dispatch } from "react"
+
+export const ChatPage = ({suggestions, setQuery}: {suggestions: any, setQuery:  Dispatch<SetStateAction<string>>}) => {
     return(
         <ul>
           {suggestions.map((item: any, idx: any) => (
-            <li key={idx}>{item.title}</li>
+            <li key={idx} className="cursor-pointer hover:bg-neutral-100 rounded-md p-2" onClick={() => setQuery(item.title)}>{item.title}</li>
           ))}
         </ul>
     )
