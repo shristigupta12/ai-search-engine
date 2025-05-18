@@ -1,0 +1,16 @@
+/* You can put this in your global styles, e.g., styles/globals.css */
+.markdown-body table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+    font-size: 0.95em;
+  }
+  .markdown-body th, .markdown-body td {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: left;
+  }
+  .markdown-body th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }

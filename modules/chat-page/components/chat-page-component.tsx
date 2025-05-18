@@ -13,6 +13,8 @@ import { getMessages } from "@/modules/chat-page/services/getMessages";
 import { useGetAllSessions } from "@/modules/sidebar/services/get-all-sessions";
 import { SessionDetailsType } from "@/modules/sidebar/types/session-details-type";
 import { useRouter } from "next/navigation";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export const ChatPageComponent = ({chatId}: {chatId: string}) => {
 
@@ -30,7 +32,6 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
     const {data: sessions} = useGetAllSessions();
 
     useEffect(()=>{
-        console.log("sessions: ", sessions);
         const sessionPresent = sessions?.data.some((session: SessionDetailsType) => session.id === chatId);
         if(!sessionPresent){
             router.push('/');
@@ -99,10 +100,18 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
 
     return(
         <div className="min-h-screen relative">
-            <div className="w-full h-full flex flex-col gap-4 pb-8">
+            <div className="w-full h-full flex flex-col gap-4 pb-8 items-end">
                 {messages?.data?.map((message: ChatMessageType) => (
-                    <div key={message.id} className={`${message.role === 'user' ? ' bg-neutral-100 rounded-md p-2' : 'ml-0'}`}>
-                        {message.content}
+                    <div key={message.id} className={`${message.role === 'user' ? ' bg-neutral-100 rounded-md p-2 w-fit text-sm' : 'ml-0 w-full'}`}>
+                        {message.role === 'ai' ? (
+                            <div className="markdown-body">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    {message.content}
+                                </ReactMarkdown>
+                            </div>
+                        ) : (
+                            message.content
+                        )}
                     </div>
                 ))}
                 {AILoader && <BouncingDotsLoader /> }

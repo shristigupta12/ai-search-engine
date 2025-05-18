@@ -76,10 +76,10 @@ export function Sidebar() {
                 transition={{ duration: 0.3, ease: "easeInOut" }}
             >
                 <div 
-                    className={`fixed top-0 left-0 overflow-y-auto h-screen flex items-center flex-col gap-2 px-4 py-10 ${isOpen? "w-54": "w-10"}`}
+                    className={`fixed top-0 left-0 overflow-y-auto h-screen flex items-center flex-col gap-10 px-4 py-10 ${isOpen? "w-54": "w-10"}`}
                 >
                     {isDeleting && <BouncingDotsLoader onPage={true} />}
-                    <div className={`flex w-full gap-2 ${isOpen? "flex-row justify-between items-center": "flex-col justify-center"}`}>
+                    <div className={`flex w-full gap-4 ${isOpen? "flex-row justify-between items-center": "flex-col justify-center"}`}>
                         <IconLayoutSidebarLeftExpand size={24} className="text-neutral-500 hover:text-neutral-700 hover:cursor-pointer" onClick={() => toggleOpen()}  />
                         <Button className="size-6 rounded-md bg-neutral-600 flex items-center justify-center hover:cursor-pointer hover:bg-neutral-700" onClick={handleNewChat}>
                             <IconPlus className="text-white size-4" />
