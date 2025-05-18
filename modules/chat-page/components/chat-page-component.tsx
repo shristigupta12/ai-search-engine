@@ -11,17 +11,21 @@ import { useSidebar } from "@/modules/sidebar/context/sidebar-context";
 import BouncingDotsLoader from "@/components/common/loader/bouncing-dots-loader";
 import { getMessages } from "@/modules/chat-page/services/getMessages";
 import { useGetAllSessions } from "@/modules/sidebar/services/get-all-sessions";
-import { SessionDetailsType } from "@/modules/sidebar/types/session-details-type";
-import { useRouter } from "next/navigation";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
-export const ChatPageComponent = ({chatId}: {chatId: string}) => {
+const splitStringIntoChunks = (str: string, chunkSize: number = 50): string[] => {
+    const chunks: string[] = [];
+    for (let i = 0; i < str.length; i += chunkSize) {
+        chunks.push(str.slice(i, i + chunkSize));
+    }
+    return chunks;
+};
 
+export const ChatPageComponent = ({chatId}: {chatId: string}) => {
     const [AILoader, setAILoader] = useState(false);
     const [searchInput, setSearchInput] = useState('');
     const {isOpen} = useSidebar();
-    const router = useRouter();
     const {mutate} = useAskGpt();
     const {mutate: addMessage} = useAddMessage();
     const {data: messages, isLoading, isError, error, refetch} = useQuery({
@@ -30,20 +34,39 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
         staleTime: 3600000,
     })
     const {data: sessions} = useGetAllSessions();
+    const [showStreamedMessage, setShowStreamedMessage] = useState(false);
+    const [streamedMessage, setStreamedMessage] = useState('');
 
-    useEffect(()=>{
-        const sessionPresent = sessions?.data.some((session: SessionDetailsType) => session.id === chatId);
-        if(!sessionPresent){
-            router.push('/');
+    useEffect(() => {
+        if (showStreamedMessage) {
+            const len = messages?.data.length;
+            const lastMessage = messages?.data[len - 1];
+            const chunks = splitStringIntoChunks(lastMessage?.content || '');
+            let currentMessage = '';
+            
+            const interval = setInterval(() => {
+                if (chunks.length === 0) {
+                    clearInterval(interval);
+                    return;
+                }
+                const nextChunk = chunks.shift() || '';
+                currentMessage += nextChunk;
+                setStreamedMessage(currentMessage);
+            }, 2000);
+
+            setShowStreamedMessage(false);
+
+            // Cleanup interval on unmount or when showStreamedMessage changes
+            return () => clearInterval(interval);
         }
-    }, [sessions])
-
+    }, [showStreamedMessage, messages])
+    
     
     const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchInput(e.target.value);
     }
 
-    function addMessageToChat(message: string, role: string){
+    function addMessageToChat(message: string, role: string, showStreaming: boolean = false){
         addMessage(
             {
                 session_id: chatId,
@@ -51,8 +74,9 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                 role: role
             },
             {
-                onSuccess: () => {
-                    refetch();
+                onSuccess: async () => {
+                    await refetch();
+                    setShowStreamedMessage(showStreaming);
                     setSearchInput('');
                 },
                 onError: (error) => {
@@ -62,11 +86,12 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
             }
         );
     }
-
+    
     const handleSearch = () => {
-        addMessageToChat(searchInput, 'user');
+        addMessageToChat(searchInput, 'user', true);
     }
 
+  
     useEffect(()=>{
         const len: number = messages?.data.length;
         const lastMessage = messages?.data[len - 1];
@@ -77,8 +102,7 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                 {userInput: lastMessage.content},
                 {
                     onSuccess: (responseData) => {
-                        console.log("data: ", responseData);
-                        addMessageToChat(responseData, 'ai');
+                        addMessageToChat(responseData, 'ai', false);
                         setAILoader(false);
                     },
                     onError: (error) => {
@@ -91,11 +115,12 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
         }
     }, [messages])
 
-    useEffect(()=>{
-        console.log("sessions: ", sessions);
-    }, [sessions])
 
-    if(isLoading) return <BouncingDotsLoader />
+    if(isLoading) return 
+        <div className="w-full flex items-center justify-center">
+        <BouncingDotsLoader />
+        </div>
+        
     if(isError) return <div>Error: {error?.message}</div>
 
     return(
@@ -106,7 +131,7 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                         {message.role === 'ai' ? (
                             <div className="markdown-body">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                    {message.content}
+                                    {showStreamedMessage && message === messages?.data[messages.data.length - 1] ? streamedMessage : message.content} 
                                 </ReactMarkdown>
                             </div>
                         ) : (
@@ -114,7 +139,11 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                         )}
                     </div>
                 ))}
-                {AILoader && <BouncingDotsLoader /> }
+                {AILoader && 
+                <div className="w-full">
+                    <BouncingDotsLoader />
+                </div>
+                }
             </div>
             <div className={` ${isOpen ? "w-[37vw]" : "w-[46vw]"} fixed bottom-0 rounded-md bg-white pb-4`}>
                 <SearchBar onInputChange={handleSearchInputChange} inputValue={searchInput} handleSearch={handleSearch} disableSearchButton={searchInput.length===0 || AILoader}/>

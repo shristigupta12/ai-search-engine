@@ -17,7 +17,7 @@ export const SearchBar = ({onInputChange, inputValue, handleSearch, disableSearc
                 className="w-full pr-20 min-w-[500px] shadow-sm " 
                 onChange={onInputChange} 
                 onKeyDown={handleKeyDown}
-                placeholder="What is the weather today?" 
+                placeholder="What is Next.js?" 
                 value={inputValue} 
             />
             <Button variant={"ghost"} size={"icon"} className="absolute right-12 top-1/2 -translate-y-1/2 text-neutral-500 cursor-pointer h-7">

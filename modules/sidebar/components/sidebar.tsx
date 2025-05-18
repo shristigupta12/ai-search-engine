@@ -49,6 +49,7 @@ export function Sidebar() {
                         refetch();
                         setDeleteDialogOpen(false);
                         setSessionToDelete(null);
+                        handleNewChat();
                     },
                     onError: () => {
                         toast.error("Failed to delete session");
