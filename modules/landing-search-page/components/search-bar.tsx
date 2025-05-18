@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import { SearchBar } from "@/components/common/search-bar";
 import { useDebounce} from 'use-debounce'
 import { useStaticSearchSuggestions } from "../services/get-static-search-suggestions";
+import { getAllSessions } from "@/modules/sidebar/services/get-all-sessions";
+import { useQuery } from "@tanstack/react-query";
 // import { useGptSearchSuggestions } from "../services/get-gpt-search-suggestions";
 
 export default function SearchBarMainPage() {
@@ -19,6 +21,11 @@ export default function SearchBarMainPage() {
     const {data: suggestions = [], isLoading} = useStaticSearchSuggestions(debouncedQuery);
     // const { mutate: getGptSuggestions, isError: isGptError, error: gptError } = useGptSearchSuggestions();
     const {mutate: createChatSession, isPending} = useCreateChatSession();
+    const {refetch} = useQuery({
+        queryKey: ['sessions'],
+        queryFn: getAllSessions,
+        staleTime: 3600000,
+    })
 
     const handleSearch = () => {
         const session_id = crypto.randomUUID();
@@ -29,6 +36,7 @@ export default function SearchBarMainPage() {
         }, {
             onSuccess: () => {
                 router.push(`/chat/${session_id}`);
+                refetch();
             },
             onError: (error) => {
                 toast.error(error?.message);

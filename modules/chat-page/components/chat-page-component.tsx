@@ -7,24 +7,24 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { SearchBar } from "@/components/common/search-bar";
+import { useSidebar } from "@/modules/sidebar/context/sidebar-context";
 
 export const ChatPageComponent = ({chatId}: {chatId: string}) => {
 
     const [AILoader, setAILoader] = useState(false);
     const [searchInput, setSearchInput] = useState('');
-
-    const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchInput(e.target.value);
-    }
-
+    const {isOpen} = useSidebar();
+    const {mutate} = useAskGpt();
+    const {mutate: addMessage} = useAddMessage();
     const {data: messages, isLoading, isError, error, refetch} = useQuery({
         queryKey: ['chat-messages', chatId],
         queryFn: () => fetch(`/api/chat/all_messages?session_id=${chatId}`).then(res => res.json()),
         staleTime: 3600000,
     })
-
-    const {mutate} = useAskGpt();
-    const {mutate: addMessage} = useAddMessage();
+    
+    const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchInput(e.target.value);
+    }
 
     function addMessageToChat(message: string, role: string){
         addMessage(
@@ -79,15 +79,15 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
 
     return(
         <div className="min-h-screen relative">
-            <div className="w-full h-full flex flex-col gap-4">
+            <div className="w-full h-full flex flex-col gap-4 pb-8">
                 {messages?.data?.map((message: ChatMessageType) => (
-                    <div key={message.id} className={`${message.role === 'user' ? 'ml-[30vw] bg-neutral-100 rounded-md p-2' : 'ml-0'}`}>
+                    <div key={message.id} className={`${message.role === 'user' ? ' bg-neutral-100 rounded-md p-2' : 'ml-0'}`}>
                         {message.content}
                     </div>
                 ))}
                 {AILoader && <p>Loading...</p> }
             </div>
-            <div className="flex-1 w-[50vw] fixed bottom-0 p-2">
+            <div className={` ${isOpen ? "w-[37vw]" : "w-[46vw]"} fixed bottom-0 rounded-md bg-white pb-4`}>
                 <SearchBar onInputChange={handleSearchInputChange} inputValue={searchInput} handleSearch={handleSearch} disableSearchButton={searchInput.length===0 || AILoader}/>
             </div>
         </div>

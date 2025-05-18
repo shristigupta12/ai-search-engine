@@ -1,3 +1,4 @@
+
 import { ChatPageComponent } from "@/modules/chat-page/components/chat-page-component";
 
 // app/chat/[chatId]/page.tsx
