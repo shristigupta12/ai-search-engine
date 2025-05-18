@@ -11,7 +11,7 @@ export const LayoutContainer = ({children}: {children: React.ReactNode}) => {
       <QueryClientProvider client={queryClient}>
         <div className="flex">
             <Sidebar />
-            <div className="flex-1 text-neutral-600 px-80 py-10">
+            <div className="flex-1 text-neutral-600 px-60 py-10 ">
               {children}
             </div>
         </div>

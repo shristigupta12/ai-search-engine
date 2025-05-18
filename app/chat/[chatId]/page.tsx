@@ -2,10 +2,11 @@
 import { ChatPageComponent } from "@/modules/chat-page/components/chat-page-component";
 
 // app/chat/[chatId]/page.tsx
-export default function ChatPage({ params }: { params: { chatId: string } }) {
+export default async function ChatPage({ params }: { params: { chatId: string } }) {
+    const {chatId} = await params;
     return (
       <div>
-        <ChatPageComponent chatId={params.chatId} />
+        <ChatPageComponent chatId={chatId} />
       </div>
     );
   }

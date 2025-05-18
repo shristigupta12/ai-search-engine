@@ -2,8 +2,6 @@ import { LandingSearchPage } from "@/modules/landing-search-page/components/land
 
 export default function Home() {
   return (
-    <div>
       <LandingSearchPage />
-    </div>
   );
 }
