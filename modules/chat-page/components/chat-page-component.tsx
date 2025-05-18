@@ -9,19 +9,34 @@ import { toast } from "sonner";
 import { SearchBar } from "@/components/common/search-bar";
 import { useSidebar } from "@/modules/sidebar/context/sidebar-context";
 import BouncingDotsLoader from "@/components/common/loader/bouncing-dots-loader";
+import { getMessages } from "@/modules/chat-page/services/getMessages";
+import { useGetAllSessions } from "@/modules/sidebar/services/get-all-sessions";
+import { SessionDetailsType } from "@/modules/sidebar/types/session-details-type";
+import { useRouter } from "next/navigation";
 
 export const ChatPageComponent = ({chatId}: {chatId: string}) => {
 
     const [AILoader, setAILoader] = useState(false);
     const [searchInput, setSearchInput] = useState('');
     const {isOpen} = useSidebar();
+    const router = useRouter();
     const {mutate} = useAskGpt();
     const {mutate: addMessage} = useAddMessage();
     const {data: messages, isLoading, isError, error, refetch} = useQuery({
         queryKey: ['chat-messages', chatId],
-        queryFn: () => fetch(`/api/chat/all_messages?session_id=${chatId}`).then(res => res.json()),
+        queryFn: () => getMessages(chatId),
         staleTime: 3600000,
     })
+    const {data: sessions} = useGetAllSessions();
+
+    useEffect(()=>{
+        console.log("sessions: ", sessions);
+        const sessionPresent = sessions?.data.some((session: SessionDetailsType) => session.id === chatId);
+        if(!sessionPresent){
+            router.push('/');
+        }
+    }, [sessions])
+
     
     const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchInput(e.target.value);
@@ -74,6 +89,10 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
             );
         }
     }, [messages])
+
+    useEffect(()=>{
+        console.log("sessions: ", sessions);
+    }, [sessions])
 
     if(isLoading) return <BouncingDotsLoader />
     if(isError) return <div>Error: {error?.message}</div>

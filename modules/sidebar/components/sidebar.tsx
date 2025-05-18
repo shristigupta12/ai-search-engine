@@ -7,7 +7,7 @@ import { SessionDetailsType } from "../types/session-details-type";
 import { useRouter, usePathname } from "next/navigation";
 import { IconLayoutSidebarLeftExpand, IconPlus, IconTrash } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button";
-import { getAllSessions } from "../services/get-all-sessions";
+import { getAllSessions, useGetAllSessions } from "../services/get-all-sessions";
 import BouncingDotsLoader from "@/components/common/loader/bouncing-dots-loader";
 import { motion } from "framer-motion";
 import { useDeleteChatSession } from "../services/delete-session";
@@ -22,11 +22,7 @@ export function Sidebar() {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
 
-    const {data: sessions, isLoading, isError, error, refetch} = useQuery({
-        queryKey: ['sessions'],
-        queryFn: getAllSessions,
-        staleTime: 3600000,
-    })
+    const {data: sessions, isLoading, isError, error, refetch} = useGetAllSessions();
     
     const handleSessionClick = (sessionId: string) => {
         router.refresh();
