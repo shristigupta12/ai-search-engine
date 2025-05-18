@@ -18,7 +18,7 @@ export default function SearchBarMainPage() {
     const [gptSuggestions, setGptSuggestions] = useState<string[]>([]);
     const {data: suggestions = [], isLoading} = useStaticSearchSuggestions(debouncedQuery);
     // const { mutate: getGptSuggestions, isError: isGptError, error: gptError } = useGptSearchSuggestions();
-    const {mutate: createChatSession, isSuccess, isPending, isError, error: createChatSessionError} = useCreateChatSession();
+    const {mutate: createChatSession, isPending} = useCreateChatSession();
 
     const handleSearch = () => {
         const session_id = crypto.randomUUID();
@@ -26,13 +26,15 @@ export default function SearchBarMainPage() {
             session_id: session_id,
             title: inputValue.slice(0, 20),
             text_prompt: inputValue
+        }, {
+            onSuccess: () => {
+                router.push(`/chat/${session_id}`);
+            },
+            onError: (error) => {
+                toast.error(error?.message);
+            }
         })
-        if(isError) return toast.error(createChatSessionError?.message);
         
-        if(isSuccess) {
-            console.log("Session created");
-        }
-        router.push(`/chat/${session_id}`);
     }
     
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,7 +60,6 @@ export default function SearchBarMainPage() {
     // }, [suggestions, debouncedQuery]);
 
     if(isPending) return <div>Loading...</div>
-    if(isError) return <div>Error: {createChatSessionError?.message}</div>
 
     return(
         <div className="flex flex-col gap-3">

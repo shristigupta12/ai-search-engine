@@ -21,6 +21,7 @@ export function Sidebar() {
     if(isError) return <div>Error: {error?.message}</div>
 
     const handleSessionClick = (sessionId: string) => {
+        router.refresh();
         router.push(`/chat/${sessionId}`);
     }
 

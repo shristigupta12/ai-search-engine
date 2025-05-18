@@ -1,3 +1,5 @@
+"use client"
+
 import { useAskGpt } from "@/modules/chat-page/services/useAskGpt";
 import { useAddMessage } from "@/modules/chat-page/services/useAddMessage";
 import { ChatMessageType } from "@/modules/chat-page/types/message-details-type";
@@ -51,6 +53,7 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
     useEffect(()=>{
         const len: number = messages?.data.length;
         const lastMessage = messages?.data[len - 1];
+        console.log("lastMessage: ", lastMessage);
         if(lastMessage && lastMessage?.role === 'user'){
             setAILoader(true);
             mutate(
