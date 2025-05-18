@@ -1,7 +1,7 @@
 import { SetStateAction } from "react"
 import { Dispatch } from "react"
 
-export const ChatPage = ({suggestions, setQuery}: {suggestions: any, setQuery:  Dispatch<SetStateAction<string>>}) => {
+export const Suggestions = ({suggestions, setQuery}: {suggestions: any, setQuery:  Dispatch<SetStateAction<string>>}) => {
     return(
         <ul>
           {suggestions.map((item: any, idx: any) => (

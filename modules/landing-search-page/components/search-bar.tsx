@@ -1,41 +1,71 @@
 "use client"
 
-import { IconLinkPlus } from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
-import { IconArrowRight } from "@tabler/icons-react";
-import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { ChatPage } from "./chat-page";
+import { Suggestions } from "./suggestions";
+import { useCreateChatSession } from "../services/create-chat-session";
+import { toast } from "sonner"
+import { useRouter } from "next/navigation";
+import { SearchBar } from "@/components/common/search-bar";
+import { useDebounce} from 'use-debounce'
+import { useStaticSearchSuggestions } from "../services/get-static-search-suggestions";
+// import { useGptSearchSuggestions } from "../services/get-gpt-search-suggestions";
 
-export default function SearchBar() {
-
+export default function SearchBarMainPage() {
     const [query, setQuery] = useState<string>('');
     const [inputValue, setInputValue] = useState<string>('');
+    const [debouncedQuery] = useDebounce(query, 2000);
+    const router = useRouter();
+    const [gptSuggestions, setGptSuggestions] = useState<string[]>([]);
+    const {data: suggestions = [], isLoading} = useStaticSearchSuggestions(debouncedQuery);
+    // const { mutate: getGptSuggestions, isError: isGptError, error: gptError } = useGptSearchSuggestions();
+    const {mutate: createChatSession, isSuccess, isPending, isError, error: createChatSessionError} = useCreateChatSession();
 
-    const {data: suggestions = [], isLoading} = useQuery({
-        queryKey: ['autocomplete', query],
-        queryFn: async () => {
-            if (!query) return [];
-            const res = await fetch(`/api/autocomplete?query=${query}`);
-            return res.json();
-        },
-        enabled: !!query,
-    })
+    const handleSearch = () => {
+        const session_id = crypto.randomUUID();
+        createChatSession({
+            session_id: session_id,
+            title: inputValue.slice(0, 20),
+            text_prompt: inputValue
+        })
+        if(isError) return toast.error(createChatSessionError?.message);
+        
+        if(isSuccess) {
+            console.log("Session created");
+        }
+        router.push(`/chat/${session_id}`);
+    }
+    
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setQuery(e.target.value);
+        setInputValue(e.target.value);
+    }
 
+    // useEffect(() => {
+    //     if (suggestions.length === 0 && debouncedQuery.trim().length > 0) {
+    //         const query = debouncedQuery.trim();
+    //         if(query.length > 0) {
+    //             getGptSuggestions(query, {
+    //                 onSuccess: (data) => {
+    //                     setGptSuggestions(data);
+    //                 },
+    //                 onError: (error) => {
+    //                     console.error('Error fetching GPT suggestions:', error);
+    //                     toast.error('Failed to fetch GPT suggestions');
+    //                 }
+    //             });
+    //         }
+    //     }
+    // }, [suggestions, debouncedQuery]);
+
+    if(isPending) return <div>Loading...</div>
+    if(isError) return <div>Error: {createChatSessionError?.message}</div>
 
     return(
         <div className="flex flex-col gap-3">
-            <div className="relative flex ">
-                <Input className="w-[50vw] pr-18" onChange={e=> {setQuery(e.target.value); setInputValue(e.target.value)}} placeholder="What is the weather today?" value={inputValue} />
-                <Button variant={"ghost"} size={"icon"} className="absolute right-12 top-1/2 -translate-y-1/2 text-neutral-500 cursor-pointer h-7">
-                    <IconLinkPlus size={20} />
-                </Button>
-                <Button variant={"ghost"} size={"icon"} className="absolute right-2 top-1/2 -translate-y-1/2 hover:text-white text-white bg-neutral-600 rounded-md p-1 hover:bg-neutral-700 cursor-pointer h-7">
-                    <IconArrowRight size={20} />
-                </Button>
-            </div>
-            {isLoading ? <div>Loading...</div> : suggestions.length > 0 ? <ChatPage suggestions={suggestions} setQuery={setInputValue}/> : <div></div>}
+            <SearchBar onInputChange={handleInputChange} inputValue={inputValue} handleSearch={handleSearch} disableSearchButton={inputValue.length===0}/>
+            {isLoading ? <div>Loading...</div> : suggestions.length > 0 ? <Suggestions suggestions={suggestions} setQuery={setInputValue}/> : 
+                gptSuggestions.length > 0 ? <Suggestions suggestions={gptSuggestions} setQuery={setInputValue}/> : <div></div>
+            }
         </div>
     )
 }
