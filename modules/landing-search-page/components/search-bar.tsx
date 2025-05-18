@@ -10,6 +10,7 @@ import { useDebounce} from 'use-debounce'
 import { useStaticSearchSuggestions } from "../services/get-static-search-suggestions";
 import { getAllSessions } from "@/modules/sidebar/services/get-all-sessions";
 import { useQuery } from "@tanstack/react-query";
+import BouncingDotsLoader from "@/components/common/loader/bouncing-dots-loader";
 // import { useGptSearchSuggestions } from "../services/get-gpt-search-suggestions";
 
 export default function SearchBarMainPage() {
@@ -67,12 +68,16 @@ export default function SearchBarMainPage() {
     //     }
     // }, [suggestions, debouncedQuery]);
 
-    if(isPending) return <div>Loading...</div>
+    if(isPending) return <BouncingDotsLoader />
 
     return(
         <div className="flex flex-col gap-3">
             <SearchBar onInputChange={handleInputChange} inputValue={inputValue} handleSearch={handleSearch} disableSearchButton={inputValue.length===0}/>
-            {isLoading ? <div>Loading...</div> : suggestions.length > 0 ? <Suggestions suggestions={suggestions} setQuery={setInputValue}/> : 
+            {isLoading ? 
+            <div className="mt-2">
+            <BouncingDotsLoader />
+            </div>
+             : suggestions.length > 0 ? <Suggestions suggestions={suggestions} setQuery={setInputValue}/> : 
                 gptSuggestions.length > 0 ? <Suggestions suggestions={gptSuggestions} setQuery={setInputValue}/> : <div></div>
             }
         </div>

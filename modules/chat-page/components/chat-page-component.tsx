@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { SearchBar } from "@/components/common/search-bar";
 import { useSidebar } from "@/modules/sidebar/context/sidebar-context";
+import BouncingDotsLoader from "@/components/common/loader/bouncing-dots-loader";
 
 export const ChatPageComponent = ({chatId}: {chatId: string}) => {
 
@@ -74,7 +75,7 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
         }
     }, [messages])
 
-    if(isLoading) return <div>Loading...</div>
+    if(isLoading) return <BouncingDotsLoader />
     if(isError) return <div>Error: {error?.message}</div>
 
     return(
@@ -85,7 +86,7 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                         {message.content}
                     </div>
                 ))}
-                {AILoader && <p>Loading...</p> }
+                {AILoader && <BouncingDotsLoader /> }
             </div>
             <div className={` ${isOpen ? "w-[37vw]" : "w-[46vw]"} fixed bottom-0 rounded-md bg-white pb-4`}>
                 <SearchBar onInputChange={handleSearchInputChange} inputValue={searchInput} handleSearch={handleSearch} disableSearchButton={searchInput.length===0 || AILoader}/>
