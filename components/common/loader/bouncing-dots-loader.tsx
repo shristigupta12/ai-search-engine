@@ -1,6 +1,6 @@
 import styles from './bouncing-dots-loader.module.css';
 
-const BouncingDotsLoader = ({onPage}:{onPage?: boolean}) => (
+const BouncingDotsLoader = () => (
   <div className={styles.loader}></div>
 );
 

@@ -1,6 +1,6 @@
 import { supabase } from "../../../../lib/supabaseClient";
 
-export async function GET(request) {
+export async function GET() {
     const {data, error} = await supabase
     .from('chat_sessions')
     .select('*')

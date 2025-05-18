@@ -23,6 +23,6 @@ export async function POST(request: Request) {
         const data = await response.json();
         return NextResponse.json({ answer: data.choices[0].message.content });
     } catch (error) {
-        return NextResponse.json({ error: 'Failed to fetch from OpenAI API' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to fetch from OpenAI API', errorMessage: error }, { status: 500 });
     }
 }
