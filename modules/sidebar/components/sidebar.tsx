@@ -14,7 +14,7 @@ import { useDeleteChatSession } from "../services/delete-session";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useState } from "react";
-
+import SignOutButton from "@/components/common/sign-out-button";
 export function Sidebar() {
     const router = useRouter();
     const pathname = usePathname();
@@ -120,6 +120,7 @@ export function Sidebar() {
                     <IconMessageCircle size={24} className="text-neutral-500 hover:text-neutral-700 hover:cursor-pointer" onClick={toggleOpen} />
                 }
                     </div>
+                    {isOpen && <SignOutButton className="absolute bottom-5 left-12 cursor-pointer bg-neutral-700" />}
                 </div>
             </motion.div>
 

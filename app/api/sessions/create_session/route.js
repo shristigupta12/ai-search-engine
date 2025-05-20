@@ -1,6 +1,9 @@
+import { getSupabaseUser } from "@/lib/getSupabaseUser";
 import { supabase } from "../../../../lib/supabaseClient";
 
 export async function POST(request) {
+    const user = await getSupabaseUser();
+    if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
     try{
         const {session_id, title, text_prompt} = await request.json();
 
@@ -9,7 +12,8 @@ export async function POST(request) {
         .insert({
             id: session_id, 
             title: title,
-            initial_prompt: text_prompt
+            initial_prompt: text_prompt,
+            user_id: user.id
         })
         .select();
 
@@ -20,7 +24,8 @@ export async function POST(request) {
         .insert({
             session_id: session_id,
             content: text_prompt,
-            role: 'user'
+            role: 'user',
+            user_id: user.id
         })
         .select();
 

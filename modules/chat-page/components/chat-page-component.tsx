@@ -95,7 +95,6 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
     useEffect(()=>{
         const len: number = messages?.data.length;
         const lastMessage = messages?.data[len - 1];
-        console.log("lastMessage: ", lastMessage);
         if(lastMessage && lastMessage?.role === 'user'){
             setAILoader(true);
             mutate(

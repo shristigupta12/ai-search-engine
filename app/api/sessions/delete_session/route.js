@@ -1,7 +1,12 @@
 import { supabase } from "../../../../lib/supabaseClient";
+import { getSupabaseUser } from "@/lib/getSupabaseUser";
 
 export async function DELETE(request) {
     try {
+
+        const user = await getSupabaseUser();
+        if (!user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+
         const { session_id } = await request.json();
 
         if (!session_id) {
@@ -12,7 +17,8 @@ export async function DELETE(request) {
         const { error: messageDeleteError } = await supabase
             .from('chat_messages')
             .delete()
-            .eq('session_id', session_id);
+            .eq('session_id', session_id)
+            .eq('user_id', user.id);
 
         if (messageDeleteError) {
             return new Response(JSON.stringify({ error: messageDeleteError.message }), { status: 500 });
