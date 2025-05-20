@@ -122,6 +122,7 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
         
     if(isError) return <div>Error: {error?.message}</div>
 
+
     return(
         <div className="min-h-screen relative">
             <div className="w-full h-full flex flex-col gap-4 pb-8 items-end">
@@ -144,7 +145,7 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                 </div>
                 }
             </div>
-            <div className={` ${isOpen ? " w-[calc(100vw-462px-240px)]" : "w-[calc(100vw-296px-243px)]"}  fixed bottom-0 rounded-md pb-3`}>
+            <div className={` ${isOpen ? " lg:w-[calc(100vw-462px-240px)] md:w-[calc(100vw-130px-160px)] w-[calc(100vw-130px)]" : "lg:w-[calc(100vw-296px-243px)] w-[calc(100vw-130px)]"} fixed bottom-0 rounded-md pb-3`}>
                 <SearchBar onInputChange={handleSearchInputChange} inputValue={searchInput} handleSearch={handleSearch} disableSearchButton={searchInput.length===0 || AILoader} chatPage={true} />
             </div>
         </div>

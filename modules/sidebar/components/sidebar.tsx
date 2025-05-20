@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useState } from "react";
 import SignOutButton from "@/components/common/sign-out-button";
+
 export function Sidebar() {
     const router = useRouter();
     const pathname = usePathname();
