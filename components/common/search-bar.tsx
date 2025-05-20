@@ -12,7 +12,7 @@ export const SearchBar = ({onInputChange, inputValue, handleSearch, disableSearc
     };
 
     return(
-        <div className={cn("relative flex w-full bg-white ", chatPage ? "pb-3" : "pb-0")}>
+        <div className={cn("relative flex w-full bg-white ", chatPage ? "pb-3" : "pb-0", className)}>
             <Input 
                 className=" pr-20 w-full min-w-[400px] bg-neutral-50 py-6 " 
                 onChange={onInputChange} 
