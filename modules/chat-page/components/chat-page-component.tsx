@@ -145,8 +145,8 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                 </div>
                 }
             </div>
-            <div className={` ${isOpen ? "w-[37vw]" : "w-[46vw]"} fixed bottom-0 rounded-md bg-white pb-4`}>
-                <SearchBar onInputChange={handleSearchInputChange} inputValue={searchInput} handleSearch={handleSearch} disableSearchButton={searchInput.length===0 || AILoader}/>
+            <div className={` ${isOpen ? " w-[calc(100vw-462px-240px)]" : "w-[calc(100vw-296px-243px)]"}  fixed bottom-0 rounded-md pb-3`}>
+                <SearchBar onInputChange={handleSearchInputChange} inputValue={searchInput} handleSearch={handleSearch} disableSearchButton={searchInput.length===0 || AILoader} chatPage={true} />
             </div>
         </div>
     )

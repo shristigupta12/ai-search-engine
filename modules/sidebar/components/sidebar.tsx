@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { SessionDetailsType } from "../types/session-details-type";
 import { useRouter, usePathname } from "next/navigation";
-import { IconLayoutSidebarLeftExpand, IconPlus, IconTrash } from "@tabler/icons-react"
+import { IconMessageCircle, IconLayoutSidebarLeftExpand, IconPlus, IconTrash } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button";
 import { getAllSessions, useGetAllSessions } from "../services/get-all-sessions";
 import BouncingDotsLoader from "@/components/common/loader/bouncing-dots-loader";
@@ -72,22 +72,38 @@ export function Sidebar() {
     return(
         <>
             <motion.div 
-                className={cn("min-h-screen bg-neutral-50 flex items-center flex-col gap-2", isOpen ? "w-60" : "w-0")}
-                animate={{ width: isOpen ? 240 : 0 }}
+                className={cn("min-h-screen bg-neutral-100 flex items-center flex-col gap-2")}
+                animate={{ width: isOpen ? 200 : 40 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
             >
                 <div 
-                    className={`fixed top-0 left-0 overflow-y-auto h-screen flex items-center flex-col gap-10 px-4 py-10 ${isOpen? "w-54": "w-10"}`}
+                    className={`fixed top-0 left-0 overflow-y-auto h-screen flex items-center flex-col  px-4 py-10 ${isOpen? "w-54 gap-10": "w-[53px] gap-4"}`}
                 >
                     {isDeleting && <BouncingDotsLoader />}
-                    <div className={`flex w-full gap-4 ${isOpen? "flex-row justify-between items-center": "flex-col justify-center"}`}>
+                    <motion.div 
+                        className={`flex w-full gap-4`}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ 
+                            opacity: 1,
+                            x: 0,
+                            flexDirection: isOpen ? "row" : "column",
+                            justifyContent: isOpen ? "space-between" : "center",
+                            alignItems: isOpen ? "center" : "center"
+                        }}
+                        transition={{ 
+                            duration: 0.3,
+                            flexDirection: { duration: 0.8 },
+                            justifyContent: { duration: 0.8 },
+                            alignItems: { duration: 0.3 }
+                        }}
+                    >
                         <IconLayoutSidebarLeftExpand size={24} className="text-neutral-500 hover:text-neutral-700 hover:cursor-pointer" onClick={() => toggleOpen()}  />
-                        <Button className="size-6 rounded-md bg-neutral-600 flex items-center justify-center hover:cursor-pointer hover:bg-neutral-700" onClick={handleNewChat}>
+                        <Button className="size-6 rounded-full bg-neutral-600 flex items-center justify-center hover:cursor-pointer hover:bg-neutral-700" onClick={handleNewChat}>
                             <IconPlus className="text-white size-4" />
                         </Button>
-                    </div>
-                    <div className="flex flex-col gap-2 w-full">
-                    {isOpen && sessions?.data?.map((session: SessionDetailsType) => (
+                    </motion.div>
+                    <div className="flex flex-col gap-2 w-full items-center">
+                    {isOpen ? sessions?.data?.map((session: SessionDetailsType) => (
                         <motion.div 
                             key={session.id} 
                             className={`group flex justify-between items-center gap-2 w-full hover:cursor-pointer hover:bg-neutral-200 rounded-md p-2 ${session.id === currentSessionId ? "bg-neutral-200" : "bg-none"}`} 
@@ -99,7 +115,10 @@ export function Sidebar() {
                             <p className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px]">{session.title}</p>
                             <IconTrash size={16} className="text-neutral-500 hover:text-neutral-700 hover:cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => handleDeleteClick(session.id, e)} />
                         </motion.div>
-                    ))}
+                    ))
+                    :
+                    <IconMessageCircle size={24} className="text-neutral-500 hover:text-neutral-700 hover:cursor-pointer" onClick={toggleOpen} />
+                }
                     </div>
                 </div>
             </motion.div>
