@@ -140,4 +140,16 @@
   }
 }
 
+/* Prevent markdown code blocks from causing horizontal overflow */
+.markdown-body pre {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+  overflow-x: auto;
+  max-width: 100%;
+}
+.markdown-body code {
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+}
+
 

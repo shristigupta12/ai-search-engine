@@ -125,9 +125,9 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
 
     return(
         <div className="min-h-screen relative">
-            <div className="w-full h-full flex flex-col gap-4 pb-8 items-end">
+            <div className="max-w-full h-full flex flex-col gap-4 pb-8 items-end ">
                 {messages?.data?.map((message: ChatMessageType) => (
-                    <div key={message.id} className={`${message.role === 'user' ? ' bg-neutral-100 rounded-md p-2 w-fit text-sm' : 'ml-0 w-full'}`}>
+                    <div key={message.id} className={` ${message.role === 'user' ? ' bg-neutral-100 rounded-md p-2 w-fit text-sm' : 'ml-0 max-w-full'}`}>
                         {message.role === 'ai' ? (
                             <div className="markdown-body">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
