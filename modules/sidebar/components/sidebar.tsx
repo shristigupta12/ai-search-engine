@@ -13,7 +13,7 @@ import { motion } from "framer-motion";
 import { useDeleteChatSession } from "../services/delete-session";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SignOutButton from "@/components/common/sign-out-button";
 
 export function Sidebar() {
@@ -22,15 +22,22 @@ export function Sidebar() {
     const {toggleOpen, isOpen} = useSidebar();
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
+    const [sessionChangeLoader, setSessionChangeLoader] = useState(false);
+
+    useEffect(() => {
+        setSessionChangeLoader(false);
+    }, [pathname]);
 
     const {data: sessions, isLoading, isError, error, refetch} = useGetAllSessions();
     
     const handleSessionClick = (sessionId: string) => {
+        setSessionChangeLoader(true);
         router.refresh();
         router.push(`/chat/${sessionId}`);
     }
     
     const handleNewChat = () => {
+        setSessionChangeLoader(true);
         router.push('/');
     }
 
@@ -67,11 +74,13 @@ export function Sidebar() {
     ? pathname.split('/chat/')[1]
     : null;
     
-    if(isLoading) return <BouncingDotsLoader />
+    // if(isLoading) return <BouncingDotsLoader />
     if(isError) return <div>Error: {error?.message}</div>
 
     return(
         <>
+
+            {(sessionChangeLoader || isLoading || isDeleting) && <BouncingDotsLoader onPage={true} />}
             <motion.div 
                 className={cn("min-h-screen bg-neutral-100 flex items-center flex-col gap-2")}
                 animate={{ width: isOpen ? 200 : 40 }}
@@ -80,7 +89,6 @@ export function Sidebar() {
                 <div 
                     className={`fixed top-0 left-0 overflow-y-auto h-screen flex items-center flex-col  px-4 py-10 ${isOpen? "w-54 gap-10": "w-[53px] gap-4"}`}
                 >
-                    {isDeleting && <BouncingDotsLoader />}
                     <motion.div 
                         className={`flex w-full gap-4`}
                         initial={{ opacity: 0, x: -20 }}
