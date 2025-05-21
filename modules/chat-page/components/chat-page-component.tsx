@@ -36,6 +36,11 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
     const {data: sessions} = useGetAllSessions();
     const [showStreamedMessage, setShowStreamedMessage] = useState(false);
     const [streamedMessage, setStreamedMessage] = useState('');
+    const [locallyAddedMessage, setLocallyAddedMessage] = useState<string | null>(null);
+
+    useEffect(() => {
+        setLocallyAddedMessage(null);
+    }, [messages])
 
     useEffect(() => {
         if (showStreamedMessage) {
@@ -88,6 +93,8 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
     }
     
     const handleSearch = () => {
+        setSearchInput('');
+        setLocallyAddedMessage(searchInput);
         addMessageToChat(searchInput, 'user', true);
     }
 
@@ -139,6 +146,9 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                         )}
                     </div>
                 ))}
+                {locallyAddedMessage!=null && 
+                    <p className="bg-neutral-100 rounded-md p-2 w-fit text-sm">{locallyAddedMessage}</p>
+                } 
                 {AILoader && 
                 <div className="w-full">
                     <BouncingDotsLoader />
