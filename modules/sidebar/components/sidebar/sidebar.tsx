@@ -159,7 +159,7 @@ export function Sidebar() {
           </motion.div>
           <div className="flex w-full flex-col items-center gap-2">
             {isOpen ? (
-              <div className="flex w-full flex-col gap-4">
+              <div className="flex w-full flex-col gap-0">
                 {Object.entries(groups).map(([groupName, sessions]) =>
                   sessions.length > 0 ? (
                     <Accordion type="single" key={groupName} collapsible className="w-full" defaultValue={groupName}>

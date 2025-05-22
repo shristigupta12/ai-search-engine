@@ -9,7 +9,7 @@ export async function GET() {
     .from('chat_sessions')
     .select('*')
     .eq('user_id', user.id)
-    .order('created_at', {descending: true});
+    .order('created_at', {ascending: false});
 
     if(error) return new Response(JSON.stringify({error: error.message}), {status: 500});
 
