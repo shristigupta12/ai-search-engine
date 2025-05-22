@@ -1,6 +1,5 @@
 "use client"
 
-import { useAskGpt } from "@/modules/chat-page/services/useAskGpt";
 import { useAddMessage } from "@/modules/chat-page/services/useAddMessage";
 import { ChatMessageType } from "@/modules/chat-page/types/message-details-type";
 import { useQuery } from "@tanstack/react-query";
@@ -13,6 +12,7 @@ import { getMessages } from "@/modules/chat-page/services/getMessages";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { motion } from 'framer-motion';
+import { fetchStreamedAIResponse } from "../services/useAskGpt";
 
 const splitStringIntoChunks = (str: string, chunkSize: number = 50): string[] => {
     const chunks: string[] = [];
@@ -26,7 +26,6 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
     const [AILoader, setAILoader] = useState(false);
     const [searchInput, setSearchInput] = useState('');
     const {isOpen} = useSidebar();
-    const {mutate} = useAskGpt();
     const {mutate: addMessage} = useAddMessage();
     const {data: messages, isLoading, isError, error, refetch} = useQuery({
         queryKey: ['chat-messages', chatId],
@@ -36,6 +35,11 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
     const [showStreamedMessage, setShowStreamedMessage] = useState(false);
     const [streamedMessage, setStreamedMessage] = useState('');
     const [locallyAddedMessage, setLocallyAddedMessage] = useState<string | null>(null);
+    const [aiResponse, setAiResponse] = useState("");
+    const [isStreaming, setIsStreaming] = useState(false);
+    const [sendDataToApi, setSendDataToApi] = useState(false);
+
+   
 
     useEffect(() => {
         setLocallyAddedMessage(null);
@@ -98,25 +102,46 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
         addMessageToChat(searchInput, 'user', true);
     }
 
+    const handleSend = async (userInput: string) => {
+        setAiResponse("");
+        setIsStreaming(true);
+
+        await fetchStreamedAIResponse(
+        userInput,
+        (chunk) => setAiResponse((prev) => prev + chunk),
+        () => {setIsStreaming(false); setSendDataToApi(true)}
+        );
+    };
+
+    useEffect(()=>{
+        if(sendDataToApi){
+            addMessageToChat(aiResponse, 'ai', false);
+            setSendDataToApi(false);
+            setAiResponse("");
+            setIsStreaming(false);
+        }
+    }, [sendDataToApi])
+
   
     useEffect(()=>{
         const len: number = messages?.data.length;
         const lastMessage = messages?.data[len - 1];
         if(lastMessage && lastMessage?.role === 'user'){
             setAILoader(true);
-            mutate(
-                {userInput: lastMessage.content},
-                {
-                    onSuccess: (responseData) => {
-                        addMessageToChat(responseData, 'ai', false);
-                    },
-                    onError: (error) => {
-                        toast.error('Failed to get answer');
-                        console.error(error);
-                        setAILoader(false);
-                    }
-                }
-            );
+            // mutate(
+            //     {userInput: lastMessage.content},
+            //     {
+            //         onSuccess: (responseData) => {
+            //             addMessageToChat(responseData, 'ai', false);
+            //         },
+            //         onError: (error) => {
+            //             toast.error('Failed to get answer');
+            //             console.error(error);
+            //             setAILoader(false);
+            //         }
+            //     }
+            // );
+            handleSend(lastMessage.content);
         }
     }, [messages])
 
@@ -151,7 +176,7 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                         )}
                     </motion.div>
                 ))}
-                {locallyAddedMessage!=null && 
+                {/* {locallyAddedMessage!=null && 
                     <motion.p 
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -160,7 +185,14 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                     >
                         {locallyAddedMessage}
                     </motion.p>
-                } 
+                }  */}
+                {isStreaming && 
+                    <div className="markdown-body">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {aiResponse}
+                    </ReactMarkdown>
+                </div>
+                }
                 {AILoader && 
                 <motion.div 
                     initial={{ opacity: 0 }}

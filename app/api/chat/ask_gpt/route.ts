@@ -16,12 +16,20 @@ export async function POST(request: Request) {
                     {role: 'system', content: 'You are a helpful AI assistant.'},
                     {role: 'user', content: userInput}
                 ],
-                max_tokens: 300
+                max_tokens: 300,
+                stream: true
             })
         })
 
-        const data = await response.json();
-        return NextResponse.json({ answer: data.choices[0].message.content });
+        // const data = await response.json();
+        // return NextResponse.json({ answer: data.choices[0].message.content });
+        return new NextResponse(response.body, {
+            headers: {
+                'Content-Type': 'text/event-stream',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive'
+            }
+        })
     } catch (error) {
         return NextResponse.json({ error: 'Failed to fetch from OpenAI API', errorMessage: error }, { status: 500 });
     }
