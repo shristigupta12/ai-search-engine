@@ -24,13 +24,17 @@ export function Sidebar() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null)
   const [sessionChangeLoader, setSessionChangeLoader] = useState(false)
+  // Extract session ID from URL path containing 'chat'
+  const currentSessionId = pathname.includes('/chat/') ? pathname.split('/chat/')[1] : null
 
   const { data: sessions, isLoading, isError, error, refetch } = useGetAllSessions()
 
   const handleSessionClick = (sessionId: string) => {
-    setSessionChangeLoader(true)
-    router.refresh()
-    router.push(`/chat/${sessionId}`)
+    if(currentSessionId !== sessionId){
+      setSessionChangeLoader(true)
+      router.refresh()
+      router.push(`/chat/${sessionId}`)
+    }
   }
 
   const handleNewChat = () => {
@@ -99,8 +103,6 @@ export function Sidebar() {
     return groups
   }
 
-  // Extract session ID from URL path containing 'chat'
-  const currentSessionId = pathname.includes('/chat/') ? pathname.split('/chat/')[1] : null
 
   useEffect(() => {
     setSessionChangeLoader(false)

@@ -22,29 +22,84 @@ const splitStringIntoChunks = (str: string, chunkSize: number = 50): string[] =>
     return chunks;
 };
 
+interface LocalMessage {
+    role: string;
+    content: string;
+}
+
 export const ChatPageComponent = ({chatId}: {chatId: string}) => {
     const [AILoader, setAILoader] = useState(false);
     const [searchInput, setSearchInput] = useState('');
     const {isOpen} = useSidebar();
     const {mutate: addMessage} = useAddMessage();
-    const {data: messages, isLoading, isError, error, refetch} = useQuery({
+    const {data: messages, isLoading, isError, error} = useQuery({
         queryKey: ['chat-messages', chatId],
         queryFn: () => getMessages(chatId),
         staleTime: 3600000,
     })
     const [showStreamedMessage, setShowStreamedMessage] = useState(false);
     const [streamedMessage, setStreamedMessage] = useState('');
-    const [locallyAddedMessage, setLocallyAddedMessage] = useState<string | null>(null);
-    const [aiResponse, setAiResponse] = useState("");
     const [isStreaming, setIsStreaming] = useState(false);
     const [sendDataToApi, setSendDataToApi] = useState(false);
-
-   
-
-    useEffect(() => {
-        setLocallyAddedMessage(null);
-    }, [messages])
-
+    const [localMessages, setLocalMessages] = useState<LocalMessage[]>([]);
+    
+    const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchInput(e.target.value);
+    }
+    
+    function addMessageToChat(message: string, role: string, showStreaming: boolean = false){
+        addMessage(
+            {
+                session_id: chatId,
+                message: message || '...',
+                role: role
+            },
+            {
+                onSuccess: async () => {
+                    setShowStreamedMessage(showStreaming);
+                    setSearchInput('');
+                    setAILoader(false);
+                },
+                onError: (error) => {
+                    toast.error('Failed to get answer');
+                    console.error(error);
+                }
+            }
+        );
+    }
+    
+    const handleSearch = () => {
+        setSearchInput('');
+        setLocalMessages([...localMessages, {role: 'user', content: searchInput}]);
+        addMessageToChat(searchInput, 'user', true);
+        handleSend(searchInput);
+    }
+    
+    const handleSend = async (userInput: string) => {
+        // Add initial AI message
+        setLocalMessages(prev => [...prev, { role: 'ai', content: '' }]);
+        setIsStreaming(true);
+        
+        await fetchStreamedAIResponse(
+            userInput,
+            (chunk) => {
+                setLocalMessages(prev => {
+                    const newMessages = [...prev];
+                    const lastIndex = newMessages.length - 1;
+                    newMessages[lastIndex] = {
+                        ...newMessages[lastIndex],
+                        content: newMessages[lastIndex].content + chunk,
+                    };
+                    return newMessages;
+                });
+            },
+            () => {
+                setIsStreaming(false);
+                setSendDataToApi(true);
+            }
+        );
+    };
+    
     useEffect(() => {
         if (showStreamedMessage) {
             const len = messages?.data.length;
@@ -68,79 +123,24 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
             return () => clearInterval(interval);
         }
     }, [showStreamedMessage, messages])
-    
-    
-    const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchInput(e.target.value);
-    }
-
-    function addMessageToChat(message: string, role: string, showStreaming: boolean = false){
-        addMessage(
-            {
-                session_id: chatId,
-                message: message || '...',
-                role: role
-            },
-            {
-                onSuccess: async () => {
-                    await refetch();
-                    setShowStreamedMessage(showStreaming);
-                    setSearchInput('');
-                    setAILoader(false);
-                },
-                onError: (error) => {
-                    toast.error('Failed to get answer');
-                    console.error(error);
-                }
-            }
-        );
-    }
-    
-    const handleSearch = () => {
-        setSearchInput('');
-        setLocallyAddedMessage(searchInput);
-        addMessageToChat(searchInput, 'user', true);
-    }
-
-    const handleSend = async (userInput: string) => {
-        setAiResponse("");
-        setIsStreaming(true);
-
-        await fetchStreamedAIResponse(
-        userInput,
-        (chunk) => setAiResponse((prev) => prev + chunk),
-        () => {setIsStreaming(false); setSendDataToApi(true)}
-        );
-    };
 
     useEffect(()=>{
         if(sendDataToApi){
-            addMessageToChat(aiResponse, 'ai', false);
+            const lastMessage = localMessages[localMessages.length - 1];
+            if (lastMessage) {
+                addMessageToChat(lastMessage.content, 'ai', false);
+            }
             setSendDataToApi(false);
-            setAiResponse("");
             setIsStreaming(false);
         }
     }, [sendDataToApi])
 
-  
     useEffect(()=>{
+        setLocalMessages([]);
         const len: number = messages?.data.length;
         const lastMessage = messages?.data[len - 1];
         if(lastMessage && lastMessage?.role === 'user'){
             setAILoader(true);
-            // mutate(
-            //     {userInput: lastMessage.content},
-            //     {
-            //         onSuccess: (responseData) => {
-            //             addMessageToChat(responseData, 'ai', false);
-            //         },
-            //         onError: (error) => {
-            //             toast.error('Failed to get answer');
-            //             console.error(error);
-            //             setAILoader(false);
-            //         }
-            //     }
-            // );
             handleSend(lastMessage.content);
         }
     }, [messages])
@@ -168,7 +168,7 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                         {message.role === 'ai' ? (
                             <div className="markdown-body">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                    {showStreamedMessage && message === messages?.data[messages.data.length - 1] ? streamedMessage : message.content} 
+                                    {message.content} 
                                 </ReactMarkdown>
                             </div>
                         ) : (
@@ -176,23 +176,26 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                         )}
                     </motion.div>
                 ))}
-                {/* {locallyAddedMessage!=null && 
-                    <motion.p 
+                {localMessages.map((message, index) => (
+                    <motion.div 
+                        key={index} 
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="bg-neutral-100 rounded-md p-2 w-fit text-sm"
-                    >
-                        {locallyAddedMessage}
-                    </motion.p>
-                }  */}
-                {isStreaming && 
-                    <div className="markdown-body">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {aiResponse}
-                    </ReactMarkdown>
-                </div>
-                }
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                    className={` ${message.role === 'user' ? ' bg-neutral-100 rounded-md p-2 w-fit text-sm' : 'ml-0 max-w-full'}`}
+                >
+                    {message.role === 'ai' ? (
+                        <div className="markdown-body w-full">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {showStreamedMessage && message === messages?.data[messages.data.length - 1] ? streamedMessage : message.content} 
+                            </ReactMarkdown>
+                        </div>
+                    ) : (
+                        message.content
+                    )}
+                </motion.div>
+                ))}
+              
                 {AILoader && 
                 <motion.div 
                     initial={{ opacity: 0 }}
