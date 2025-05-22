@@ -15,7 +15,7 @@ export const SearchBar = ({onInputChange, inputValue, handleSearch, disableSearc
     return(
         <div className={cn("relative flex w-full bg-white ", chatPage ? "pb-3" : "pb-0", className)}>
             <Input 
-                className=" pr-20 w-full sm:min-w-[400px] bg-neutral-50 sm:py-6 py-3 " 
+                className=" pr-20 w-full sm:min-w-[400px] bg-neutral-50 sm:py-6 py-3 rounded-3xl " 
                 onChange={onInputChange} 
                 onKeyDown={handleKeyDown}
                 placeholder="What is Next.js?" 

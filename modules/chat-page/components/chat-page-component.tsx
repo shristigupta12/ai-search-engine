@@ -10,9 +10,9 @@ import { SearchBar } from "@/components/common/search-bar";
 import { useSidebar } from "@/modules/sidebar/context/sidebar-context";
 import BouncingDotsLoader from "@/components/common/loader/bouncing-dots-loader";
 import { getMessages } from "@/modules/chat-page/services/getMessages";
-import { useGetAllSessions } from "@/modules/sidebar/services/get-all-sessions";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { motion } from 'framer-motion';
 
 const splitStringIntoChunks = (str: string, chunkSize: number = 50): string[] => {
     const chunks: string[] = [];
@@ -33,7 +33,6 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
         queryFn: () => getMessages(chatId),
         staleTime: 3600000,
     })
-    const {data: sessions} = useGetAllSessions();
     const [showStreamedMessage, setShowStreamedMessage] = useState(false);
     const [streamedMessage, setStreamedMessage] = useState('');
     const [locallyAddedMessage, setLocallyAddedMessage] = useState<string | null>(null);
@@ -83,6 +82,7 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                     await refetch();
                     setShowStreamedMessage(showStreaming);
                     setSearchInput('');
+                    setAILoader(false);
                 },
                 onError: (error) => {
                     toast.error('Failed to get answer');
@@ -109,7 +109,6 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                 {
                     onSuccess: (responseData) => {
                         addMessageToChat(responseData, 'ai', false);
-                        setAILoader(false);
                     },
                     onError: (error) => {
                         toast.error('Failed to get answer');
@@ -133,8 +132,14 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
     return(
         <div className="min-h-screen relative">
             <div className="max-w-full h-full flex flex-col gap-4 pb-8 items-end ">
-                {messages?.data?.map((message: ChatMessageType) => (
-                    <div key={message.id} className={` ${message.role === 'user' ? ' bg-neutral-100 rounded-md p-2 w-fit text-sm' : 'ml-0 max-w-full'}`}>
+                {messages?.data?.map((message: ChatMessageType, index: number) => (
+                    <motion.div 
+                        key={message.id} 
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                        className={` ${message.role === 'user' ? ' bg-neutral-100 rounded-md p-2 w-fit text-sm' : 'ml-0 max-w-full'}`}
+                    >
                         {message.role === 'ai' ? (
                             <div className="markdown-body">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -144,15 +149,27 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                         ) : (
                             message.content
                         )}
-                    </div>
+                    </motion.div>
                 ))}
                 {locallyAddedMessage!=null && 
-                    <p className="bg-neutral-100 rounded-md p-2 w-fit text-sm">{locallyAddedMessage}</p>
+                    <motion.p 
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="bg-neutral-100 rounded-md p-2 w-fit text-sm"
+                    >
+                        {locallyAddedMessage}
+                    </motion.p>
                 } 
                 {AILoader && 
-                <div className="w-full">
+                <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-full"
+                >
                     <BouncingDotsLoader />
-                </div>
+                </motion.div>
                 }
             </div>
             <div className={` ${isOpen ? " lg:w-[calc(100vw-462px-240px)] md:w-[calc(100vw-130px-160px)] w-[calc(100vw-130px)]" : "lg:w-[calc(100vw-296px-243px)] w-[calc(100vw-130px)]"} fixed bottom-0 rounded-md pb-3`}>
