@@ -150,20 +150,16 @@ export function Sidebar() {
               justifyContent: { duration: 0.8 },
               alignItems: { duration: 0.3 },
             }}>
-              <div className='py-2 bg-neutral-100'>
             <IconLayoutSidebarLeftExpand
               size={24}
-              className="text-neutral-500 hover:cursor-pointer hover:text-neutral-700 fixed top-3 bg-neutral-100"
+              className="text-neutral-500 hover:cursor-pointer hover:text-neutral-700"
               onClick={() => toggleOpen()}
             />
-            </div>
-            <div className='flex items-center gap-2 fixed top-9 py-4  cursor-pointer bg-neutral-100 w-50' onClick={handleNewChat}>
-              <Button
-                className="flex size-6 items-center justify-center rounded-full bg-neutral-600 hover:cursor-pointer hover:bg-neutral-700">
-                <IconPlus className="size-4 text-white" />
-              </Button>
-              {isOpen && <p className='text-sm text-neutral-600'>New Chat</p>}
-            </div>
+            <Button
+              className="flex size-6 items-center justify-center rounded-full bg-neutral-600 hover:cursor-pointer hover:bg-neutral-700"
+              onClick={handleNewChat}>
+              <IconPlus className="size-4 text-white" />
+            </Button>
           </motion.div>
           <div className="flex w-full flex-col items-center gap-2">
             {isOpen ? (
@@ -201,10 +197,10 @@ export function Sidebar() {
                 )}
               </div>
             ) : (
-              <IconMessageCircle size={24} className="text-neutral-500 hover:cursor-pointer hover:text-neutral-700 fixed top-24" onClick={toggleOpen} />
+              <IconMessageCircle size={24} className="text-neutral-500 hover:cursor-pointer hover:text-neutral-700 " onClick={toggleOpen} />
             )}
           </div>
-          {isOpen && <SignOutButton className="absolute bottom-5 left-12 cursor-pointer bg-neutral-700" />}
+          {isOpen && <SignOutButton className="fixed bottom-5 left-12 cursor-pointer bg-neutral-700" />}
         </div>
       </motion.div>
 
