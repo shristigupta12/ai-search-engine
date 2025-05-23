@@ -38,8 +38,10 @@ export function Sidebar() {
   }
 
   const handleNewChat = () => {
-    setSessionChangeLoader(true)
-    router.push('/')
+    if (pathname !== '/') {
+      setSessionChangeLoader(true)
+      router.push('/')
+    }
   }
 
   const { mutate: deleteSession, isPending: isDeleting } = useDeleteChatSession()
@@ -131,7 +133,7 @@ export function Sidebar() {
         animate={{ width: isOpen ? 200 : 40 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}>
         <div
-          className={`fixed top-0 left-0 flex h-screen flex-col items-center overflow-y-auto px-4 py-10 ${isOpen ? 'w-54 gap-10' : 'w-[53px] gap-4'}`}>
+          className={`fixed top-0 left-0 flex h-screen flex-col items-center overflow-y-auto no-scrollbar px-4 py-10 ${isOpen ? 'w-54 gap-10' : 'w-[53px] gap-4'}`}>
           <motion.div
             className={`flex w-full gap-4`}
             initial={{ opacity: 0, x: -20 }}
@@ -148,20 +150,24 @@ export function Sidebar() {
               justifyContent: { duration: 0.8 },
               alignItems: { duration: 0.3 },
             }}>
+              <div className='py-2 bg-neutral-100'>
             <IconLayoutSidebarLeftExpand
               size={24}
-              className="text-neutral-500 hover:cursor-pointer hover:text-neutral-700"
+              className="text-neutral-500 hover:cursor-pointer hover:text-neutral-700 fixed top-3 bg-neutral-100"
               onClick={() => toggleOpen()}
             />
-            <Button
-              className="flex size-6 items-center justify-center rounded-full bg-neutral-600 hover:cursor-pointer hover:bg-neutral-700"
-              onClick={handleNewChat}>
-              <IconPlus className="size-4 text-white" />
-            </Button>
+            </div>
+            <div className='flex items-center gap-2 fixed top-9 py-4  cursor-pointer bg-neutral-100 w-50' onClick={handleNewChat}>
+              <Button
+                className="flex size-6 items-center justify-center rounded-full bg-neutral-600 hover:cursor-pointer hover:bg-neutral-700">
+                <IconPlus className="size-4 text-white" />
+              </Button>
+              {isOpen && <p className='text-sm text-neutral-600'>New Chat</p>}
+            </div>
           </motion.div>
           <div className="flex w-full flex-col items-center gap-2">
             {isOpen ? (
-              <div className="flex w-full flex-col gap-0">
+              <div className="flex w-full flex-col">
                 {Object.entries(groups).map(([groupName, sessions]) =>
                   sessions.length > 0 ? (
                     <Accordion type="single" key={groupName} collapsible className="w-full" defaultValue={groupName}>
@@ -195,7 +201,7 @@ export function Sidebar() {
                 )}
               </div>
             ) : (
-              <IconMessageCircle size={24} className="text-neutral-500 hover:cursor-pointer hover:text-neutral-700" onClick={toggleOpen} />
+              <IconMessageCircle size={24} className="text-neutral-500 hover:cursor-pointer hover:text-neutral-700 fixed top-24" onClick={toggleOpen} />
             )}
           </div>
           {isOpen && <SignOutButton className="absolute bottom-5 left-12 cursor-pointer bg-neutral-700" />}
