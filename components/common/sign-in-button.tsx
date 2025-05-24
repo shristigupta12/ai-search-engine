@@ -4,9 +4,10 @@ import { useState } from "react"
 import { supabase } from "@/lib/supabaseClient"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
-
+import { useTheme } from "next-themes"
 export default function SignInButton() {
   const [isLoading, setIsLoading] = useState(false)
+  const {theme} = useTheme()
 
   const handleSignIn = async () => {
     setIsLoading(true)
@@ -34,7 +35,7 @@ export default function SignInButton() {
   }
 
   return (
-    <div className="h-screen flex items-center justify-center">
+    <div className={`h-screen flex items-center justify-center `}>
       <div className="text-center space-y-8">
         <h1 className="text-4xl font-light text-neutral-600">Welcome!</h1>
 

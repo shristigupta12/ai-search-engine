@@ -14,6 +14,7 @@ import remarkGfm from 'remark-gfm';
 import { motion } from 'framer-motion';
 import { fetchStreamedAIResponse } from "../services/useAskGpt";
 import MarkdownRenderer from "@/components/common/MarkdownRenderer";
+import { useTheme } from "next-themes";
 
 const splitStringIntoChunks = (str: string, chunkSize: number = 50): string[] => {
     const chunks: string[] = [];
@@ -43,6 +44,7 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
     const [isStreaming, setIsStreaming] = useState(false);
     const [sendDataToApi, setSendDataToApi] = useState(false);
     const [localMessages, setLocalMessages] = useState<LocalMessage[]>([]);
+    const {theme} = useTheme();
     
     const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchInput(e.target.value);
@@ -164,7 +166,7 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: index * 0.1 }}
-                        className={` ${message.role === 'user' ? ' bg-neutral-100 rounded-md p-2 w-fit text-sm' : 'ml-0 max-w-full'}`}
+                        className={` ${message.role === 'user' ? theme==="dark" ? "bg-neutral-800 rounded-md p-2 w-fit text-sm" : ' bg-neutral-100 rounded-md p-2 w-fit text-sm' : 'ml-0 max-w-full'}`}
                     >
                         {message.role === 'ai' ? (
                             <div className="markdown-body">
@@ -204,7 +206,7 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                 </motion.div>
                 }
             </div>
-            <div className={` ${isOpen ? " lg:w-[calc(100vw-462px-240px)] md:w-[calc(100vw-130px-160px)] w-[calc(100vw-130px)]" : "lg:w-[calc(100vw-296px-243px)] w-[calc(100vw-130px)]"} fixed bottom-0 rounded-md pb-3`}>
+            <div className={` ${isOpen ? " lg:w-[calc(100vw-462px-240px)] md:w-[calc(100vw-130px-160px)] w-[calc(100vw-130px)]" : "lg:w-[calc(100vw-296px-243px)] w-[calc(100vw-130px)]"} fixed bottom-0 rounded-md pb-[13px]`}>
                 <SearchBar onInputChange={handleSearchInputChange} inputValue={searchInput} handleSearch={handleSearch} disableSearchButton={searchInput.length===0 || AILoader} chatPage={true} />
             </div>
         </div>

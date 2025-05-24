@@ -16,6 +16,8 @@ import { useSidebar } from '../../context/sidebar-context'
 import { useDeleteChatSession } from '../../services/delete-session'
 import { useGetAllSessions } from '../../services/get-all-sessions'
 import { SessionDetailsType } from '../../types/session-details-type'
+import { ToggleThemeButton } from './toggle-theme-button'
+import { useTheme } from 'next-themes'
 
 export function Sidebar() {
   const router = useRouter()
@@ -26,6 +28,7 @@ export function Sidebar() {
   const [sessionChangeLoader, setSessionChangeLoader] = useState(false)
   // Extract session ID from URL path containing 'chat'
   const currentSessionId = pathname.includes('/chat/') ? pathname.split('/chat/')[1] : null
+  const {theme} = useTheme()
 
   const { data: sessions, isLoading, isError, error, refetch } = useGetAllSessions()
 
@@ -129,8 +132,8 @@ export function Sidebar() {
     <>
       {(sessionChangeLoader || isLoading || isDeleting) && <BouncingDotsLoader onPage={true} />}
       <motion.div
-        className={cn('flex min-h-screen flex-col items-center gap-2 bg-neutral-100')}
-        animate={{ width: isOpen ? 200 : 40 }}
+        className={cn('flex min-h-screen flex-col items-center gap-2 bg-neutral-100', theme === "dark" ? "bg-neutral-800" : "bg-neutral-100")}
+        animate={{ width: isOpen ? 200 : 40 }}  
         transition={{ duration: 0.3, ease: 'easeInOut' }}>
         <div
           className={`fixed top-0 left-0 flex h-screen flex-col items-center overflow-y-auto no-scrollbar px-4 py-10 ${isOpen ? 'w-54 gap-10' : 'w-[53px] gap-4'}`}>
@@ -152,13 +155,14 @@ export function Sidebar() {
             }}>
             <IconLayoutSidebarLeftExpand
               size={24}
-              className="text-neutral-500 hover:cursor-pointer hover:text-neutral-700"
+              className={` hover:cursor-pointer ${theme=="dark" ? "text-neutral-100 hover:text-neutral-300" : "text-neutral-500 hover:text-neutral-700"} `}
               onClick={() => toggleOpen()}
             />
+            <ToggleThemeButton />
             <Button
-              className="flex size-6 items-center justify-center rounded-full bg-neutral-600 hover:cursor-pointer hover:bg-neutral-700"
+              className={`flex size-6 items-center justify-center rounded-full  hover:cursor-pointer ${theme=="dark" ?  "bg-neutral-50 hover:bg-neutral-300 text-neutral-600" : "hover:bg-neutral-700 bg-neutral-600 text-white"} `}
               onClick={handleNewChat}>
-              <IconPlus className="size-4 text-white" />
+              <IconPlus className="size-4 " />
             </Button>
           </motion.div>
           <div className="flex w-full flex-col items-center gap-2">
@@ -168,21 +172,21 @@ export function Sidebar() {
                   sessions.length > 0 ? (
                     <Accordion type="single" key={groupName} collapsible className="w-full" defaultValue={groupName}>
                       <AccordionItem value={groupName}>
-                        <AccordionTrigger className="text-sm font-semibold text-neutral-700">{groupName}</AccordionTrigger>
+                        <AccordionTrigger className={`text-sm font-semibold ${theme=="dark" ? "text-white" : "text-neutral-700"}`}>{groupName}</AccordionTrigger>
                         <AccordionContent>
                           <div className="flex flex-col gap-2">
                             {sessions.map((session: SessionDetailsType) => (
                               <motion.div
                                 key={session.id}
-                                className={`group flex w-full items-center justify-between gap-2 rounded-md p-2 hover:cursor-pointer hover:bg-neutral-200 ${session.id === currentSessionId ? 'bg-neutral-200' : 'bg-none'}`}
+                                className={`group flex w-full items-center justify-between gap-2 rounded-md p-2 hover:cursor-pointer ${theme==="dark" ? "text-neutral-100" : "text-neutral-600 "}  ${session.id === currentSessionId ? theme=="dark" ? "bg-neutral-700" : 'bg-neutral-300' : 'bg-none'}`}
                                 onClick={() => handleSessionClick(session.id)}
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.3 }}>
-                                    <p className="max-w-[150px] overflow-hidden text-neutral-600 text-ellipsis whitespace-nowrap">{session.title}</p>
+                                    <p className="max-w-[150px] overflow-hidden text-ellipsis whitespace-nowrap">{session.title}</p>
                                 <IconTrash
                                   size={16}
-                                  className="text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer hover:text-neutral-700"
+                                  className={`opacity-0 transition-opacity group-hover:opacity-100 hover:cursor-pointer ${theme=="dark" ? "text-neutral-100 hover:text-neutral-300" : "hover:text-neutral-700 text-neutral-500"} `}
                                   onClick={(e) => handleDeleteClick(session.id, e)}
                                 />
                               </motion.div>
@@ -200,7 +204,9 @@ export function Sidebar() {
               <IconMessageCircle size={24} className="text-neutral-500 hover:cursor-pointer hover:text-neutral-700 " onClick={toggleOpen} />
             )}
           </div>
-          {isOpen && <SignOutButton className="fixed bottom-5 left-12 cursor-pointer bg-neutral-700" />}
+          {isOpen && <div className='fixed bottom-0 pb-3 left-12 cursor-pointer'>
+            <SignOutButton className={`${theme=="dark" ? "bg-neutral-100 text-neutral-600 hover:bg-neutral-300" : "bg-neutral-700 text-neutral-100"}`} />
+          </div>}
         </div>
       </motion.div>
 

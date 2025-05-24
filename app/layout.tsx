@@ -30,11 +30,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-hidden`}
       >
-          <SidebarProvider>
-            <LayoutContainer>
-              {children}
-            </LayoutContainer>
-          </SidebarProvider>
+        <SidebarProvider>
+          <LayoutContainer>
+            {children}
+          </LayoutContainer>
+        </SidebarProvider>
       </body>
     </html>
   );
