@@ -4,10 +4,9 @@ import { useState } from "react"
 import { supabase } from "@/lib/supabaseClient"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
-import { useTheme } from "next-themes"
+
 export default function SignInButton() {
   const [isLoading, setIsLoading] = useState(false)
-  const {theme} = useTheme()
 
   const handleSignIn = async () => {
     setIsLoading(true)

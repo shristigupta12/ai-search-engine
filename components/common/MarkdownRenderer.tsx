@@ -5,7 +5,6 @@ import { prism  } from "react-syntax-highlighter/dist/esm/styles/prism";
 import confetti from "canvas-confetti";
 import { useTheme } from "next-themes";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { okaidia } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 function CodeBlockWithCopy({
   children,
@@ -65,7 +64,7 @@ export default function MarkdownRenderer({ content }: { content: string }) {
   return (
     <ReactMarkdown
       components={{
-        code({ node, inline, className, children, ...props }: any) {
+        code: ({ inline, className, children, ...props }: React.HTMLAttributes<HTMLElement> & { inline?: boolean }) => {
           const match = /language-(\w+)/.exec(className || "");
           if (!inline && match) {
             return (

@@ -1,4 +1,4 @@
-import { IconArrowRight, IconArrowUp, IconLinkPlus } from "@tabler/icons-react";
+import { IconArrowRight, IconArrowUp } from "@tabler/icons-react";
 
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";

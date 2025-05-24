@@ -12,7 +12,6 @@ import { useTheme } from 'next-themes'
 export const LayoutContainer = ({ children }: { children: React.ReactNode }) => {
   const [queryClient] = useState(() => new QueryClient())
   const [user, setUser] = useState<User | null>(null)
-  const {theme} = useTheme()
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
