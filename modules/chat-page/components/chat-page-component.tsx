@@ -13,6 +13,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { motion } from 'framer-motion';
 import { fetchStreamedAIResponse } from "../services/useAskGpt";
+import MarkdownRenderer from "@/components/common/MarkdownRenderer";
 
 const splitStringIntoChunks = (str: string, chunkSize: number = 50): string[] => {
     const chunks: string[] = [];
@@ -167,9 +168,7 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                     >
                         {message.role === 'ai' ? (
                             <div className="markdown-body">
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                    {message.content} 
-                                </ReactMarkdown>
+                                <MarkdownRenderer content={message.content} />
                             </div>
                         ) : (
                             message.content
@@ -186,9 +185,7 @@ export const ChatPageComponent = ({chatId}: {chatId: string}) => {
                 >
                     {message.role === 'ai' ? (
                         <div className="markdown-body w-full">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                {showStreamedMessage && message === messages?.data[messages.data.length - 1] ? streamedMessage : message.content} 
-                            </ReactMarkdown>
+                            <MarkdownRenderer content={showStreamedMessage && message === messages?.data[messages.data.length - 1] ? streamedMessage : message.content} />
                         </div>
                     ) : (
                         message.content

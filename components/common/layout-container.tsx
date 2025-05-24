@@ -31,7 +31,6 @@ export const LayoutContainer = ({children}: {children: React.ReactNode}) => {
       // Not signed in
       return (
         <div className="flex flex-col items-center justify-center h-screen gap-8">
-          <h1 className="text-4xl font-semibold text-neutral-700">Welcome!</h1>
           <SignInButton />
         </div>
       );
