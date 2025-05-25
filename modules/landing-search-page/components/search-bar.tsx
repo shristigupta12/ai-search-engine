@@ -57,13 +57,14 @@ export default function SearchBarMainPage() {
 
     if(isPending) return <BouncingDotsLoader />
 
-    return(
-        <> {(newChatLoader || isLoading) &&  <BouncingDotsLoader onPage={true} />}
+     return(
+        <> {(newChatLoader) &&  <BouncingDotsLoader onPage={true} />}
         <div className="flex flex-col gap-3">
             <SearchBar onInputChange={handleInputChange} inputValue={inputValue} handleSearch={handleSearch} disableSearchButton={inputValue.length===0}/>
              {suggestions.length > 0 ? <Suggestions suggestions={suggestions} setQuery={setInputValue}/> : 
                 gptSuggestions.length > 0 ? <Suggestions suggestions={gptSuggestions} setQuery={setInputValue}/> : <div></div>
             }
+            {isLoading && <BouncingDotsLoader />}
         </div>
         </>
     )
