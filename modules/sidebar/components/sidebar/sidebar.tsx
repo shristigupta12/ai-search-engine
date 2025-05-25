@@ -178,7 +178,7 @@ export function Sidebar() {
                             {sessions.map((session: SessionDetailsType) => (
                               <motion.div
                                 key={session.id}
-                                className={`group flex w-full items-center justify-between gap-2 rounded-md p-2 hover:cursor-pointer ${theme==="dark" ? "text-neutral-100" : "text-neutral-600 "}  ${session.id === currentSessionId ? theme=="dark" ? "bg-neutral-700" : 'bg-neutral-300' : 'bg-none'}`}
+                                className={`group flex w-full items-center justify-between gap-2 rounded-md p-2 hover:cursor-pointer ${theme==="dark" ? "text-neutral-100" : "text-neutral-600 "}  ${session.id === currentSessionId ? theme=="dark" ? "bg-neutral-700" : 'bg-neutral-200' : 'bg-none'}`}
                                 onClick={() => handleSessionClick(session.id)}
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
