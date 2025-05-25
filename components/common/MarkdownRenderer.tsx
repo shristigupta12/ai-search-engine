@@ -42,7 +42,7 @@ function CodeBlockWithCopy({
     <div className="relative my-4">
       <button
         onClick={handleCopy}
-        className={`absolute top-2 right-2 z-10 px-2 py-1 rounded text-xs font-medium transition cursor-pointer ${theme==="dark" ? "bg-neutral-700 text-neutral-100 hover:text-neutral-200" : "bg-neutral-200 text-neutral-500 hover:text-neutral-400"}`}
+        className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-medium transition cursor-pointer ${theme==="dark" ? "bg-neutral-700 text-neutral-100 hover:text-neutral-200" : "bg-neutral-200 text-neutral-500 hover:text-neutral-400"}`}
         aria-label="Copy code"
       >
         {copied ? "Copied!" : "Copy"}
