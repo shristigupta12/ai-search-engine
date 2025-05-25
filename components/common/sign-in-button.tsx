@@ -42,13 +42,13 @@ export default function SignInButton() {
       transition={{ duration: 0.5 }}
     >
       <motion.div 
-        className="text-center space-y-8"
+        className="text-center space-y-6"
         initial={{ y: 20 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <motion.h1 
-          className="text-4xl font-light text-neutral-600"
+          className="text-4xl font-semibold text-neutral-600"
           initial={{ scale: 0.9 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.3 }}
